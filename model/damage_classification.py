@@ -40,7 +40,7 @@ import ast
 from keras import Sequential
 from keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Add, Input, Concatenate
 from keras.models import Model
-from keras.applications.resnet50 import ResNet50
+from keras.applications import ResNet50
 from keras import backend as K
 
 from model import *
@@ -153,7 +153,11 @@ def train_model(train_data, train_csv, test_data, test_csv, model_in, model_out)
         model.load_weights(model_in)
 
     df = pd.read_csv(train_csv)
-    class_weights = compute_class_weight('balanced', np.unique(df['labels'].to_list()), df['labels'].to_list());
+    class_weights = compute_class_weight(
+            class_weight='balanced',
+            classes=np.unique(df['labels'].to_list()),
+            y = df['labels'].to_list()
+            );
     d_class_weights = dict(enumerate(class_weights))
 
     samples = df['uuid'].count()
@@ -163,8 +167,7 @@ def train_model(train_data, train_csv, test_data, test_csv, model_in, model_out)
     train_gen_flow = augment_data(df, train_data)
 
     #Set up tensorboard logging
-    tensorboard_callbacks = keras.callbacks.TensorBoard(log_dir=LOG_DIR,
-                                                        batch_size=BATCH_SIZE)
+    tensorboard_callbacks = keras.callbacks.TensorBoard(log_dir=LOG_DIR)
 
     
     #Filepath to save model weights
@@ -176,7 +179,7 @@ def train_model(train_data, train_csv, test_data, test_csv, model_in, model_out)
                                                     mode='max')
 
     #Adds adam optimizer
-    adam = keras.optimizers.Adam(lr=LEARNING_RATE,
+    adam = keras.optimizers.Adam(learning_rate=LEARNING_RATE,
                                     beta_1=0.9,
                                     beta_2=0.999,
                                     decay=0.0,
@@ -186,14 +189,16 @@ def train_model(train_data, train_csv, test_data, test_csv, model_in, model_out)
     model.compile(loss=ordinal_loss, optimizer=adam, metrics=['accuracy', f1])
 
     #Training begins
-    model.fit_generator(generator=train_gen_flow,
-                        steps_per_epoch=steps,
-                        epochs=NUM_EPOCHS,
-                        workers=NUM_WORKERS,
-                        use_multiprocessing=True,
-                        class_weight=d_class_weights,
-                        callbacks=[tensorboard_callbacks, checkpoints],
-                        verbose=1)
+    #model.fit_generator(generator=train_gen_flow,
+    model.fit(train_gen_flow,
+                steps_per_epoch=steps,
+                epochs=NUM_EPOCHS,
+                workers=NUM_WORKERS,
+                use_multiprocessing=True,
+                class_weight=d_class_weights,
+                #callbacks=[tensorboard_callbacks, checkpoints],
+                callbacks=[checkpoints],
+                verbose=1)
 
 
     #Evalulate f1 weighted scores on validation set
