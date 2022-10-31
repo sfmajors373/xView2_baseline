@@ -45,7 +45,7 @@ from model import *
 # Configurations
 NUM_WORKERS = 4
 NUM_CLASSES = 4
-BATCH_SIZE = 64
+BATCH_SIZE = 1
 NUM_EPOCHS = 120
 LEARNING_RATE = 0.0001
 RANDOM_SEED = 123
