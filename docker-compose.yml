@@ -1,5 +1,11 @@
 version: "3.5"
+
 services:
+  triton:
+    image: 'nvcr.io/nvidia/tritonserver:22.06-py3'
+    env_file: .aws.env
+    command: ['tritonserver', '--model-repository=s3://sarah-majors/models/']
+
   main:
     build:
       context: ./

@@ -16,6 +16,8 @@ from overlay_output_to_image import submission_to_overlay_polys
 
 triton_url = 'triton:8000'
 
+model = "s3://sarah-majors/models/damage-classification/1/mode.graphdef"
+
 app = FastAPI(title='Damage Assessment')
 
 @app.post("/damage-assessment/", tags=["Damage Assessment"])
@@ -59,9 +61,6 @@ async def damage_assessment(png_pre: UploadFile = File(...), png_post: UploadFil
     # Combining the predicted polygons with the predicted labels, based off a UUID generated during the localization inference stage 
     os.system('python3 ./utils/combine_jsons.py --polys "./tmp_file_store/localization.json" --classes "tmp_file_store/classification_inference.json" --output "tmp_file_store/inference.json"')
 
-    # Make image for localization
-    # os.system('python3 ./utils/inference_image_output.py --input "tmp_file_store/localization.json" --output "tmp_file_store/tmp_imgs/localization.png"')
-
     # Make image for classification
     os.system('python3 ./utils/inference_image_output.py --input "tmp_file_store/inference.json" --output "tmp_file_store/tmp_imgs/classification.png"')
     
@@ -74,7 +73,7 @@ async def damage_assessment(png_pre: UploadFile = File(...), png_post: UploadFil
 
 
     # Clean up the tmp file tree
-    #shutil.rmtree("tmp_file_store")
+    shutil.rmtree("tmp_file_store")
 
     return StreamingResponse(io.BytesIO(png_img.tobytes()), media_type="image/png")
 

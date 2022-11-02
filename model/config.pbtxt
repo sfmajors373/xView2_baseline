@@ -1,0 +1,17 @@
+name: "damage-assessment"
+platform: "tensorflow_graphdef"
+max_batch_size: 0
+input [
+	{
+		name: "input"
+		data_type: TYPE_UINT8
+		dims: [128,128,3]
+	}
+]
+output [
+	{
+		name: "outputs"
+		data_type: TYPE_UINT8
+		dims: [4,1]
+	}
+]
