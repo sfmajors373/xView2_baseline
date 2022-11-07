@@ -14,16 +14,12 @@
 #####################################################################################################################################################################
 
 
-from PIL import Image
 import time
-import numpy as np
 import pandas as pd
 from tqdm import tqdm
 import os
 import math
 import random
-import argparse
-import logging
 import json
 from sys import exit
 import cv2
@@ -35,14 +31,6 @@ import shapely.wkt
 import shapely
 from shapely.geometry import Polygon
 from collections import defaultdict
-
-import tensorflow as tf
-import keras
-from model import * 
-
-from keras import Sequential
-from keras.layers import Conv2D, MaxPooling2D, Dense
-from model import *
 
 # Configurations
 NUM_WORKERS = 4
@@ -87,78 +75,3 @@ def create_generator(test_df, test_dir, output_json_path):
 
 
     return gen_flow
-
-# Runs inference on given test data and pretrained model
-def run_inference(test_data, test_csv, model_weights, output_json_path):
-    #logger = logging.getLogger('tcpserver')
-    #logger.propagate('###################################################### RUNNING INFERENCE ###############################################')
-
-    model = generate_xBD_baseline_model()
-    model.load_weights(model_weights)
-
-    adam = keras.optimizers.Adam(learning_rate=LEARNING_RATE,
-                                     beta_1=0.9,
-                                     beta_2=0.999,
-                                     epsilon=None,
-                                     decay=0.0,
-                                     amsgrad=False)
-
-
-    model.compile(loss=ordinal_loss, optimizer=adam, metrics=['accuracy'])
-
-    df = pd.read_csv(test_csv)
-
-    # data coming out of test_gen is (batch_size, 128, 128, 3)
-    test_gen = create_generator(df, test_data, output_json_path)
-    test_gen.reset()
-
-    for count_batch in test_gen:
-        print(count_batch)
-
-    samples = df["uuid"].count()
-
-    steps = np.ceil(samples/BATCH_SIZE)
-
-    tensorboard_callbacks = keras.callbacks.TensorBoard(log_dir=LOG_DIR, histogram_freq=1)
-
-    predictions = model.predict(generator=test_gen,
-                     callbacks=[tensorboard_callbacks],
-                     verbose=1)
-
-    predicted_indices = np.argmax(predictions, axis=1)
-    predictions_json = dict()
-    for i in range(samples):
-        filename_raw = test_gen.filenames[i]
-        filename = filename_raw.split(".")[0]
-        predictions_json[filename] = damage_intensity_encoding[predicted_indices[i]]
-
-    with open(output_json_path , 'w') as outfile:
-        json.dump(predictions_json, outfile)
-
-
-def main():
-
-    parser = argparse.ArgumentParser(description='Run Building Damage Classification Training & Evaluation')
-    parser.add_argument('--test_data',
-                        required=True,
-                        metavar="/path/to/xBD_test_dir",
-                        help="Full path to the parent dataset directory")
-    parser.add_argument('--test_csv',
-                        required=True,
-                        metavar="/path/to/xBD_test_csv",
-                        help="Full path to the parent dataset directory")
-    parser.add_argument('--model_weights',
-                        default=None,
-                        metavar='/path/to/input_model_weights',
-                        help="Path to input weights")
-    parser.add_argument('--output_json',
-                        required=True,
-                        metavar="/path/to/output_json")
-
-    args = parser.parse_args()
-
-    run_inference(args.test_data, args.test_csv, args.model_weights, args.output_json)
-
-
-if __name__ == '__main__':
-    main()
