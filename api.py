@@ -14,10 +14,6 @@ from utils import combine_jsons
 from utils import inference_image_output
 from overlay_output_to_image import submission_to_overlay_polys
 
-triton_url = 'triton:8000'
-
-model = "s3://sarah-majors/models/damage-classification/1/mode.graphdef"
-
 app = FastAPI(title='Damage Assessment')
 
 @app.post("/damage-assessment/", tags=["Damage Assessment"])

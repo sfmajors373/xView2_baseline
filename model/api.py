@@ -16,10 +16,11 @@ import shapely.wkt
 import shapely
 from shapely.geometry import Polygon
 from collections import defaultdict
-import model/process_data_inference
-import model/create_generator
-import utils/combine_jsons
-import utils/inference_image_output
+import process_data_inference
+import create_generator
+from utils import combine_jsons
+from utils import inference_image_output
+from nvidia_model import DamageClassificationModel
 
 triton_url = 'triton:8000'
 
@@ -50,6 +51,8 @@ async def classification():
 
     steps = np.ceil(samples/BATCH_SIZE)
 
+    predictions = model.predict(test_gen, verbose=1)
+
     predicted_indices = np.argmax(predictions, axis=1)
     predictions_json = dict()
 
@@ -62,3 +65,7 @@ async def classification():
         json.dump(predictions_json, outfile)
 
     return 1
+
+@app.get("/", tags=["Health Check", "Damage Classification"])
+async def root():
+    return {"message": "OK"}

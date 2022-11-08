@@ -5,8 +5,6 @@ services:
   triton:
     image: 'nvcr.io/nvidia/tritonserver:22.06-py3'
     env_file: .aws.env
-    ports:
-      - "8000:8000"
     command:
       [
         'tritonserver',
@@ -18,11 +16,16 @@ services:
       context: ./
       dockerfile: Dockerfile
     ports:
-      - "8001:8000"
+      - "8000:8000"
+    depends_on:
+      - triton
+      - damage-classification
 
   damage-classification:
     build:
       context: ./model
       dockerfile: Dockerfile
     ports:
-      - "8002:8000"
+      - "8001:8000"
+    depends_on:
+      - triton

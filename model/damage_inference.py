@@ -112,16 +112,13 @@ def run_inference(test_data, test_csv, model_weights, output_json_path):
     test_gen = create_generator(df, test_data, output_json_path)
     test_gen.reset()
 
-    for count_batch in test_gen:
-        print(count_batch)
-
     samples = df["uuid"].count()
 
     steps = np.ceil(samples/BATCH_SIZE)
 
     tensorboard_callbacks = keras.callbacks.TensorBoard(log_dir=LOG_DIR, histogram_freq=1)
 
-    predictions = model.predict(generator=test_gen,
+    predictions = model.predict(test_gen,
                      callbacks=[tensorboard_callbacks],
                      verbose=1)
 

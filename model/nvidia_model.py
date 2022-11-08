@@ -1,11 +1,12 @@
 import tritonhttpclient
 
+
 class DamageClassificationModel(object):
     '''
     Class to load the damage classification model from triton and run inference
     '''
 
-    def __init__(self, triton_url='triton:8001'):
+    def __init__(self, triton_url='triton-docker:8000'):
         self.input_name = 'Input'
         self.output_name = 'Output'
         self.model_name = 'damage-classification'
@@ -23,6 +24,4 @@ class DamageClassificationModel(object):
                                             inputs=[input0],
                                             outputs=[output])
         return_json = response.as_json(self.output_name)
-        print('*****************RETURN JSON************************')
-        print(return_json)
         return return_json
