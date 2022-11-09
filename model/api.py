@@ -17,10 +17,10 @@ import shapely
 from shapely.geometry import Polygon
 from collections import defaultdict
 import process_data_inference
-import create_generator
+from nvidia_inference import create_generator
+from nvidia_model import DamageClassificationModel
 from utils import combine_jsons
 from utils import inference_image_output
-from nvidia_model import DamageClassificationModel
 
 triton_url = 'triton:8000'
 
@@ -33,8 +33,9 @@ output_json_path = '../tmp_file_store/classification_inference.json'
 
 app = FastAPI(title="classification")
 
-@app.post("/damage-classification", tags=['Damage Classification'])
+@app.get("/damage-classification", tags=['Damage Classification'])
 async def classification():
+    print('############################## Got to here! ###################################')
     # process data for classification
     os.system('python3 ./model/process_data_inference.py --input_img "./tmp_file_store/input_files/png_post.png" --label_path "./tmp_file_store/localization.json" --output_dir "tmp_file_store/output_polygons" --output_csv "tmp_file_store/output.csv"')
 

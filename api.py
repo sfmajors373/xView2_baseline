@@ -8,6 +8,7 @@ import io
 import os
 import shutil
 import json
+import requests
 from model import process_data_inference
 from model import damage_inference
 from utils import combine_jsons
@@ -52,7 +53,13 @@ async def damage_assessment(png_pre: UploadFile = File(...), png_post: UploadFil
     os.system('python3 ./model/process_data_inference.py --input_img "./tmp_file_store/input_files/png_post.png" --label_path "./tmp_file_store/localization.json" --output_dir "tmp_file_store/output_polygons" --output_csv "tmp_file_store/output.csv"')
 
     # classify
-    os.system('python3 ./model/damage_inference.py --test_data "tmp_file_store/output_polygons" --test_csv "tmp_file_store/output.csv" --model_weights "./model/model_weights/-saved-model-99-0.32.hdf5" --output_json "tmp_file_store/classification_inference.json"')
+    #os.system('python3 ./model/damage_inference.py --test_data "tmp_file_store/output_polygons" --test_csv "tmp_file_store/output.csv" --model_weights "./model/model_weights/-saved-model-99-0.32.hdf5" --output_json "tmp_file_store/classification_inference.json"')
+
+    # classify with the other api
+    predicts = requests.get('http://damage-classification:8000/')
+    print('PREDICTS')
+    print(predicts)
+    
 
     # Combining the predicted polygons with the predicted labels, based off a UUID generated during the localization inference stage 
     os.system('python3 ./utils/combine_jsons.py --polys "./tmp_file_store/localization.json" --classes "tmp_file_store/classification_inference.json" --output "tmp_file_store/inference.json"')

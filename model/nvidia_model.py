@@ -16,6 +16,7 @@ class DamageClassificationModel(object):
         self.triton_client = tritonhttpclient.InferenceServerClient(url=triton_url, verbose=False)
 
     def predict(self, img):
+        print('#################### Got to predict #############################')
         input0 = tritonhttpclient.InferInput(self.input_name, self.input_size, 'FP32')
         input0.set_data_from_numpy(img, binary_data=False)
         output = tritonhttpclient.InferRequestedOutput(self.output_name, binary_data=False)
