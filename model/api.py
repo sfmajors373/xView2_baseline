@@ -35,12 +35,8 @@ app = FastAPI(title="classification")
 
 @app.get("/damage-classification", tags=['Damage Classification'])
 async def classification():
-    print('############################## Got to here! ###################################')
-    # process data for classification
-    os.system('python3 ./model/process_data_inference.py --input_img "./tmp_file_store/input_files/png_post.png" --label_path "./tmp_file_store/localization.json" --output_dir "tmp_file_store/output_polygons" --output_csv "tmp_file_store/output.csv"')
 
-    # classify
-    # os.system('python3 ./model/damage_inference.py --test_data "tmp_file_store/output_polygons" --test_csv "tmp_file_store/output.csv" --model_weights "./model/model_weights/-saved-model-99-0.32.hdf5" --output_json "tmp_file_store/classification_inference.json"')
+    print('############################## Got to here! ###################################')
 
     # classify using nvidia_model (triton)
     df = pd.read_csv(test_csv)
@@ -66,6 +62,7 @@ async def classification():
         json.dump(predictions_json, outfile)
 
     return 1
+
 
 @app.get("/", tags=["Health Check", "Damage Classification"])
 async def root():
