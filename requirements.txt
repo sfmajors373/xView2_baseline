@@ -21,3 +21,4 @@ starlette
 tensorboardX
 tqdm
 python-multipart
+mlflow
