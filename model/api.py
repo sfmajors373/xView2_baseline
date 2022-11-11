@@ -31,9 +31,9 @@ test_csv = '../tmp_file_store/output.csv'
 output_json_path = '../tmp_file_store/classification_inference.json'
 
 
-app = FastAPI(title="classification")
+#app = FastAPI(title="classification")
 
-@app.get("/damage-classification", tags=['Damage Classification'])
+#@app.get("/damage-classification/", tags=['Damage Classification'])
 async def classification():
 
     print('############################## Got to here! ###################################')
@@ -62,8 +62,3 @@ async def classification():
         json.dump(predictions_json, outfile)
 
     return 1
-
-
-@app.get("/", tags=["Health Check", "Damage Classification"])
-async def root():
-    return {"message": "OK"}

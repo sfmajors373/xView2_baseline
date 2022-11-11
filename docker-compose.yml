@@ -7,6 +7,8 @@ services:
     env_file: .aws.env
     ports:
       - "8000:8000"
+      - "8001:8001"
+      - "8002:8002"
     command:
       [
         'tritonserver',
@@ -17,8 +19,12 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
+    volumes:
+      - type: bind
+        source: /home/ec2-user/xView2_baseline
+        target: /working_dir
     ports:
-      - "8001:8000"
+      - "8005:8005"
     depends_on:
       - triton
       - damage-classification
@@ -27,7 +33,11 @@ services:
     build:
       context: ./model
       dockerfile: Dockerfile
+    volumes:
+      - type: bind
+        source: /home/ec2-user/xView2_baseline
+        target: /working_dir
     ports:
-      - "8002:8000"
+      - "8004:8004"
     depends_on:
       - triton

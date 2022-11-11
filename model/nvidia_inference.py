@@ -24,6 +24,8 @@ import json
 from sys import exit
 import cv2
 import datetime
+import keras
+import keras.preprocessing
 
 import logging
 
@@ -35,7 +37,7 @@ from collections import defaultdict
 # Configurations
 NUM_WORKERS = 4
 NUM_CLASSES = 4
-BATCH_SIZE = 1
+BATCH_SIZE = 64
 NUM_EPOCHS = 120
 LEARNING_RATE = 0.0001
 RANDOM_SEED = 123

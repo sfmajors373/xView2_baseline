@@ -7,8 +7,8 @@ class DamageClassificationModel(object):
     '''
 
     def __init__(self, triton_url='triton-docker:8000'):
-        self.input_name = 'Input'
-        self.output_name = 'Output'
+        self.input_name = 'input_1'
+        self.output_name = 'dense_3'
         self.model_name = 'damage-classification'
         self.model_version = '1'
         self.label = 0
@@ -16,7 +16,6 @@ class DamageClassificationModel(object):
         self.triton_client = tritonhttpclient.InferenceServerClient(url=triton_url, verbose=False)
 
     def predict(self, img):
-        print('#################### Got to predict #############################')
         input0 = tritonhttpclient.InferInput(self.input_name, self.input_size, 'FP32')
         input0.set_data_from_numpy(img, binary_data=False)
         output = tritonhttpclient.InferRequestedOutput(self.output_name, binary_data=False)
@@ -24,5 +23,6 @@ class DamageClassificationModel(object):
                                             model_version=self.model_version,
                                             inputs=[input0],
                                             outputs=[output])
-        return_json = response.as_json(self.output_name)
-        return return_json
+        print('!!!!!!!!!!!!!!!!!!!! RESPONSE: ', response)
+        logits = response.as_numpy(self.output_name)
+        return logits

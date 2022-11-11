@@ -13,4 +13,6 @@ ENV C_INCLUDE_PATH=/usr/include/gdal
 RUN pip install GDAL==3.2.2.1
 RUN pip3 install -r requirements.txt
 COPY . .
-CMD ["uvicorn", "api:app", "--host", "0.0.0.0"]
+RUN mkdir -p working_dir
+WORKDIR /working_dir
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8004", "--app-dir", "/"]

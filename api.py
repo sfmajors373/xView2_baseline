@@ -18,7 +18,7 @@ from overlay_output_to_image import submission_to_overlay_polys
 
 app = FastAPI(title='Damage Assessment')
 
-@app.post("/damage-assessment/", tags=["Damage Assessment"])
+@app.post("/damage-assessment", tags=["Damage Assessment"])
 async def damage_assessment(png_pre: UploadFile = File(...), png_post: UploadFile = File(...), label_json: UploadFile = File(...)):
     # Set up tmp file tree to store temporary images
     if "tmp_file_store" in os.listdir('.'):
@@ -49,22 +49,22 @@ async def damage_assessment(png_pre: UploadFile = File(...), png_post: UploadFil
 
     # localization
     os.system('python3 ./spacenet/src/models/inference.py --input "./tmp_file_store/input_files/png_pre.png" --weights "./model/model_weights/localization.h5" --mean "./weights/mean.npy" --output "tmp_file_store/localization.json"')
-    print('############# LOCALIZATION DONE ####################')
 
     # process data for classification
     os.system('python3 ./model/process_data_inference.py --input_img "./tmp_file_store/input_files/png_post.png" --label_path "./tmp_file_store/localization.json" --output_dir "tmp_file_store/output_polygons" --output_csv "tmp_file_store/output.csv"')
-    print('############# PROCESS DATA FOR INFERENCE DONE ####################')
 
     # classify
     #os.system('python3 ./model/damage_inference.py --test_data "tmp_file_store/output_polygons" --test_csv "tmp_file_store/output.csv" --model_weights "./model/model_weights/-saved-model-99-0.32.hdf5" --output_json "tmp_file_store/classification_inference.json"')
 
     # classify with the other api
-    predicts = requests.get('http://damage-classification:8000/damage-classification/')
+    print('*************** REQUESTING ***************')
+    predicts = requests.get('http://damage-classification:8004/damage-classification/')
+    print('*************** DONE REQUESTING ***************')
 
-    while predicts != 1:
-        time.sleep(2)
-    print('PREDICTS')
-    print(predicts)
+    # while predicts != 1:
+    #     time.sleep(2)
+    # print('PREDICTS')
+    # print(predicts)
 
     # Combining the predicted polygons with the predicted labels, based off a UUID generated during the localization inference stage 
     os.system('python3 ./utils/combine_jsons.py --polys "./tmp_file_store/localization.json" --classes "tmp_file_store/classification_inference.json" --output "tmp_file_store/inference.json"')
@@ -85,6 +85,6 @@ async def damage_assessment(png_pre: UploadFile = File(...), png_post: UploadFil
 
     return StreamingResponse(io.BytesIO(png_img.tobytes()), media_type="image/png")
 
-@app.get("/", tags=['Health Check'])
-async def root():
-    return {'message': 'OK'}
+# @app.get("/", tags=['Health Check'])
+# async def root():
+#     return {'message': 'OK'}
