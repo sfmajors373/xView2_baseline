@@ -53,18 +53,8 @@ async def damage_assessment(png_pre: UploadFile = File(...), png_post: UploadFil
     # process data for classification
     os.system('python3 ./model/process_data_inference.py --input_img "./tmp_file_store/input_files/png_post.png" --label_path "./tmp_file_store/localization.json" --output_dir "tmp_file_store/output_polygons" --output_csv "tmp_file_store/output.csv"')
 
-    # classify
-    #os.system('python3 ./model/damage_inference.py --test_data "tmp_file_store/output_polygons" --test_csv "tmp_file_store/output.csv" --model_weights "./model/model_weights/-saved-model-99-0.32.hdf5" --output_json "tmp_file_store/classification_inference.json"')
-
     # classify with the other api
-    print('*************** REQUESTING ***************')
-    predicts = requests.get('http://damage-classification:8004/damage-classification/')
-    print('*************** DONE REQUESTING ***************')
-
-    # while predicts != 1:
-    #     time.sleep(2)
-    # print('PREDICTS')
-    # print(predicts)
+    predicts = requests.get('http://damage-classification:8006/damage-classification/')
 
     # Combining the predicted polygons with the predicted labels, based off a UUID generated during the localization inference stage 
     os.system('python3 ./utils/combine_jsons.py --polys "./tmp_file_store/localization.json" --classes "tmp_file_store/classification_inference.json" --output "tmp_file_store/inference.json"')
@@ -81,10 +71,10 @@ async def damage_assessment(png_pre: UploadFile = File(...), png_post: UploadFil
 
 
     # Clean up the tmp file tree
-    #shutil.rmtree("tmp_file_store")
+    shutil.rmtree("tmp_file_store")
 
     return StreamingResponse(io.BytesIO(png_img.tobytes()), media_type="image/png")
 
-# @app.get("/", tags=['Health Check'])
-# async def root():
-#     return {'message': 'OK'}
+@app.get("/", tags=['Health Check'])
+async def root():
+    return {'message': 'OK'}

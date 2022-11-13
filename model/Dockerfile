@@ -15,4 +15,4 @@ RUN pip3 install -r requirements.txt
 COPY . .
 RUN mkdir -p working_dir
 WORKDIR /working_dir
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8004", "--app-dir", "/"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8006", "--app-dir", "/"]

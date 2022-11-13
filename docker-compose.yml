@@ -21,7 +21,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - type: bind
-        source: /home/ec2-user/xView2_baseline
+        source: /home/ubuntu/xView2_baseline
         target: /working_dir
     ports:
       - "8005:8005"
@@ -35,9 +35,9 @@ services:
       dockerfile: Dockerfile
     volumes:
       - type: bind
-        source: /home/ec2-user/xView2_baseline
+        source: /home/ubuntu/xView2_baseline
         target: /working_dir
     ports:
-      - "8004:8004"
+      - "8006:8006"
     depends_on:
       - triton

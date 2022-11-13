@@ -26,6 +26,7 @@ import logging
 import json
 import cv2
 import datetime
+import mlflow
 
 from sklearn.metrics import f1_score
 from sklearn.utils.class_weight import compute_class_weight
@@ -241,6 +242,8 @@ def main():
                         help="Path to save model")
 
     args = parser.parse_args()
+
+    mlflow.autolog()
 
     train_model(args.train_data, args.train_csv, args.test_data, args.test_csv, args.model_in, args.model_out)
 
