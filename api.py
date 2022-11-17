@@ -19,7 +19,7 @@ from overlay_output_to_image import submission_to_overlay_polys
 app = FastAPI(title='Damage Assessment')
 
 @app.post("/damage-assessment", tags=["Damage Assessment"])
-async def damage_assessment(png_pre: UploadFile = File(...), png_post: UploadFile = File(...), label_json: UploadFile = File(...)):
+async def damage_assessment(png_pre: UploadFile = File(...), png_post: UploadFile = File(...)):
     # Set up tmp file tree to store temporary images
     if "tmp_file_store" in os.listdir('.'):
         shutil.rmtree("tmp_file_store")
@@ -38,12 +38,6 @@ async def damage_assessment(png_pre: UploadFile = File(...), png_post: UploadFil
     png_post_nparr = np.fromstring(png_post_contents, np.uint8)
     png_post_img = cv2.imdecode(png_post_nparr, cv2.IMREAD_COLOR)
     cv2.imwrite("./tmp_file_store/input_files/png_post.png", png_post_img)
-
-    label_json_contents = await label_json.read()
-    label_json_string = label_json_contents.decode("utf-8")
-    with open("./tmp_file_store/input_files/label_json.json", "w") as outfile:
-        outfile.write(label_json_string)
-
 
     # run the scripts
 
